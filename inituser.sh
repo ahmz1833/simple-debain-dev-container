@@ -30,6 +30,31 @@ function show_warning() {
     echo -e "\033[33m⚠️ $1\033[0m"
 }
 
+function install_fzf(){
+    show_progress "Installing fzf..."
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/junegunn/fzf/master/install)" "" --bin
+    if [ $? -eq 0 ]; then
+        sudo mv "${HOME_DIR}/bin/fzf" "/usr/bin/fzf"
+        sudo chmod +x "/usr/bin/fzf"
+        show_success "fzf installed successfully"
+    else
+        show_error "fzf installation failed"
+    fi
+}
+
+# Check if fzf version is at least 0.48.0
+function check_fzf_version() {
+    local fzf_ver=${"$(fzf --version)"#fzf }
+    # fzf_ver is something like "0.62.0 (d226d841)"
+    local major_ver=$(echo "$fzf_ver" | cut -d'.' -f1)
+    local minor_ver=$(echo "$fzf_ver" | cut -d'.' -f2)
+    local patch_ver=$(echo "$fzf_ver" | cut -d'.' -f3 | cut -d' ' -f1)
+    if [[ "$major_ver" -gt 0 || ( "$major_ver" -eq 0 && "$minor_ver" -ge 48 ) ]]; then
+        return 0  # Version is compatible
+    else
+        return 1  # Version is not compatible
+    fi
+}
 
 # Main setup process
 show_progress "Initializing environment for user: ${USERNAME}"
@@ -40,16 +65,19 @@ rm -rf "${HOME_DIR}/.oh-my-zsh" 2>/dev/null || true
 rm -rf "${HOME_DIR}/.p10k.zsh" 2>/dev/null || true
 rm -rf "${HOME_DIR}/.zshrc" 2>/dev/null || true
 
-show_message "Installing fzf..."
-
-sudo apt remove -y fzf 2>/dev/null || true
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/junegunn/fzf/master/install)" "" --bin
-if [ $? -eq 0 ]; then
-    sudo mv "${HOME_DIR}/bin/fzf" "/usr/bin/fzf"
-    sudo chmod +x "/usr/bin/fzf"
-    show_success "fzf installed successfully"
+show_message "Checking fzf version ..."
+# Check if fzf is installed and get its version
+if ! command -v fzf &> /dev/null; then
+    show_warning "fzf is not installed. Proceeding with installation."
+    install_fzf
 else
-    show_error "fzf installation failed"
+    show_message "fzf is installed. Checking version..."
+    if ! check_fzf_version; then
+        show_warning "fzf version is not compatible. Proceeding with installation."
+        install_fzf
+    else
+        show_success "fzf is already installed and compatible."
+    fi
 fi
 
 # Install Oh-My-Zsh
@@ -156,9 +184,6 @@ alias grep='grep --color=auto'
 alias cl='clear'
 alias ..='cd ..'
 alias ...='cd ../..'
-alias update='sudo apt update && sudo apt upgrade -y'
-alias install='sudo apt install'
-alias remove='sudo apt remove'
 EOL
 
 show_success ".zshrc created successfully"
