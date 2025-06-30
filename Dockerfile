@@ -56,6 +56,7 @@ RUN set -e; \
     git \
     zsh \
     bat \
+    zoxide \
     locales \
     exa \
     ca-certificates \

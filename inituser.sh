@@ -155,15 +155,14 @@ COMPLETION_WAITING_DOTS="true"
 # Standard plugins
 plugins=(
   git
-  fzf
-  docker
-  sudo
-  history
-  command-not-found
   zsh-autocomplete
   zsh-autosuggestions
   zsh-syntax-highlighting
   zsh-history-substring-search
+  fzf
+  docker
+  sudo
+  command-not-found
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -194,6 +193,11 @@ alias grep='grep --color=auto'
 alias cl='clear'
 alias ..='cd ..'
 alias ...='cd ../..'
+
+# If zoxide is installed, initialize it
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
 EOL
 
 show_success ".zshrc created successfully"
