@@ -132,6 +132,15 @@ if [ ! -d "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-history-substring-search" ]
     fi
 fi
 
+if [ ! -d "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autocomplete" ]; then
+    git clone --depth=1 https://github.com/marlonrichert/zsh-autocomplete.git "${HOME_DIR}/.oh-my-zsh/custom/plugins/zsh-autocomplete"
+    if [ $? -eq 0 ]; then
+        show_success "zsh-autocomplete plugin installed successfully"
+    else
+        show_error "zsh-autocomplete installation failed"
+    fi
+fi
+
 # Create ZSH configuration files if they don't exist or if we're forcing regeneration
 show_progress "Creating .zshrc configuration..."
     
@@ -151,6 +160,7 @@ plugins=(
   sudo
   history
   command-not-found
+  zsh-autocomplete
   zsh-autosuggestions
   zsh-syntax-highlighting
   zsh-history-substring-search
@@ -235,8 +245,49 @@ if [ ! -f "${HOME_DIR}/.p10k.zsh" ]; then
   typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
   typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{blue}❯%f "
 
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=232
+  typeset -g POWERLEVEL9K_OS_ICON_BACKGROUND=7
   typeset -g POWERLEVEL9K_DIR_FOREGROUND=254
   typeset -g POWERLEVEL9K_DIR_FOREGROUND=254
+
+  typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND=2
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=3
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=2
+  typeset -g POWERLEVEL9K_VCS_CONFLICTED_BACKGROUND=3
+  typeset -g POWERLEVEL9K_VCS_LOADING_BACKGROUND=8
+
+  # Enable OK_PIPE, ERROR_PIPE and ERROR_SIGNAL status states to allow us to enable, disable and
+  # style them independently from the regular OK and ERROR state.
+  typeset -g POWERLEVEL9K_STATUS_EXTENDED_STATES=true
+
+  # Status on success. No content, just an icon. No need to show it if prompt_char is enabled as
+  # it will signify success by turning green.
+  typeset -g POWERLEVEL9K_STATUS_OK=true
+  typeset -g POWERLEVEL9K_STATUS_OK_VISUAL_IDENTIFIER_EXPANSION='✔'
+  typeset -g POWERLEVEL9K_STATUS_OK_FOREGROUND=2
+  typeset -g POWERLEVEL9K_STATUS_OK_BACKGROUND=0
+
+  # Status when some part of a pipe command fails but the overall exit status is zero. It may look
+  # like this: 1|0.
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE=true
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE_VISUAL_IDENTIFIER_EXPANSION='✔'
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE_FOREGROUND=2
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE_BACKGROUND=0
+
+  # Status when it's just an error code (e.g., '1'). No need to show it if prompt_char is enabled as
+  # it will signify error by turning red.
+  typeset -g POWERLEVEL9K_STATUS_ERROR=true
+  typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION='✘'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=3
+  typeset -g POWERLEVEL9K_STATUS_ERROR_BACKGROUND=1
+
+  # Status when the last command was terminated by a signal.
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL=true
+  # Use terse signal names: "INT" instead of "SIGINT(2)".
+  typeset -g POWERLEVEL9K_STATUS_VERBOSE_SIGNAME=false
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION='✘'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_FOREGROUND=3
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_BACKGROUND=1
 
   # Execution time
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=0
